@@ -33,9 +33,6 @@ class GeneratePatternRequest(BaseModel):
         "Sweatpants",
         "T-Shirt",
         "Cargo Pants",
-        "Leggings",
-        "Sports Bra",
-        "Shorts",
     ] = "Luxury Hoodie"
     measurements: Measurements
     seam_allowance: float = Field(0.375, gt=0)
