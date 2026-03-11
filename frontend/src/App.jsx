@@ -2,7 +2,7 @@ import { useMemo, useState } from 'react'
 import Preview3D from './components/Preview3D'
 import { detectGarment, exportPattern, generatePattern } from './lib/api'
 
-const templates = ['Luxury Hoodie', 'Tech Jacket', 'Joggers', 'Sweatpants', 'T-Shirt', 'Cargo Pants']
+const templates = ['Luxury Hoodie', 'Tech Jacket', 'Joggers', 'Sweatpants', 'T-Shirt', 'Cargo Pants', 'Leggings', 'Sports Bra', 'Shorts']
 
 const defaultMeasurements = {
   chest: 40,
@@ -26,11 +26,32 @@ export default function App() {
   const [detection, setDetection] = useState(null)
   const [pattern, setPattern] = useState(null)
   const [exports, setExports] = useState(null)
+  const [isDetecting, setIsDetecting] = useState(false)
+  const [detectError, setDetectError] = useState('')
 
   const payload = useMemo(
     () => ({ garment_type: template, seam_allowance: seamAllowance, fit, measurements }),
     [fit, measurements, seamAllowance, template],
   )
+
+  const handleDetect = async () => {
+    if (!file) {
+      setDetectError('Please upload a garment image before running AI detection.')
+      return
+    }
+
+    setIsDetecting(true)
+    setDetectError('')
+    try {
+      const result = await detectGarment(file)
+      setDetection(result)
+    } catch (error) {
+      setDetection(null)
+      setDetectError(error instanceof Error ? error.message : 'Detection failed')
+    } finally {
+      setIsDetecting(false)
+    }
+  }
 
   return (
     <main className="min-h-screen bg-zinc-950 px-6 py-8 text-zinc-100">
@@ -43,12 +64,10 @@ export default function App() {
         <section className="grid gap-6 md:grid-cols-2">
           <Card title="Upload Garment">
             <input type="file" accept="image/png,image/jpeg,image/webp" onChange={(e) => setFile(e.target.files?.[0] || null)} />
-            <button
-              className="btn"
-              onClick={async () => file && setDetection(await detectGarment(file))}
-            >
-              Run AI Garment Detection
+            <button className="btn disabled:cursor-not-allowed disabled:bg-zinc-600" disabled={isDetecting} onClick={handleDetect}>
+              {isDetecting ? 'Detecting...' : 'Run AI Garment Detection'}
             </button>
+            {detectError && <p className="rounded-lg border border-rose-600/50 bg-rose-900/20 p-2 text-sm text-rose-300">{detectError}</p>}
             {detection && <pre className="panel">{JSON.stringify(detection, null, 2)}</pre>}
           </Card>
 

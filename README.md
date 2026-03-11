@@ -31,3 +31,6 @@ npm run dev
 ```
 
 Set API base URL with `VITE_API_BASE_URL` if needed (defaults to `http://localhost:8000`).
+
+
+Supported garment templates include Luxury Hoodie, Tech Jacket, Joggers, Sweatpants, T-Shirt, Cargo Pants, Leggings, Sports Bra, and Shorts.
